@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/style.css" type="text/css">
+
+    <style>
+        select.filterDropdown{
+            height: 20px;
+            border-radius: 5px;
+            display: block;
+        }
+        tr.shown span.isShown{
+            display: block;
+        }
+        tr.shown span.isHidden{
+            display: none;
+        }
+        tr span.isShown{
+            display: none;
+        }
+        tr span.isHidden{
+            display: block;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+    <title>Abschlussarbeitsinfotool</title>
+</head>
+<body>
+    <header>
+        <h1 class = "site-logo"><img src="/Bilder/TH_Nuernberg_RGB.jpg"
+                                     alt="Logo der Startseite"
+                                     width = "340"
+                                     height = "50"></h1>
+        <div class ="a">
+            <p class="site-slogan" style="color:black"><strong>ThesisAndMore</strong></p>
+            <p class="site-slogan-beschreibung" style="color:black">Dein Weg zur Abschlussarbeit!</p>
+        </div>
+    </header>
+    <!-- Navigationsbar -->
+    <nav class="site-nav">
+
+        <ul class="site-nav-list">
+            <li><a href ="startseite.html">Startseite</a></li>
+            <li><a href ="allgInfo.html">Allgemeine Informationen</a></li>
+            <li><a class="current" href ="abschlussarbeitsthemen.html">Abschlussarbeitsthemen</a></li>
+            <li><a href ="vorschlaege.html">Eigene Themenvorschläge</a></li>
+            <li><a href ="professoren.html">Professoren</a></li>
+
+            <div class ="site-nav-right">
+                <li><a href ="mailto:info@th-nuernberg.de">E-Mail</a></li>
+                <li><a href = "#tel"><link>+49 911/5880-0</link></a></li>
+            </div>
+        </ul>
+
+    </nav>
+
+    <!-- Begrüßungstext -->
+    <main class="mainClass">
+        <p class="begrueßung" style = color:black>Angebote für Abschlussarbeiten</p>
+        <p class="begrueßung2" style = color:black>Falls sie eine Arbeit anbieten möchten, kontaktieren Sie bitte den zuständigen <a href ="professoren.html">Dozent</a>
+        <hr/>
+        <!-- Tabelle -->
+        <table id="myTable" class ="display" style ="width:100%;background-color: lightblue"></table>
+    </main>
+    <script>
+
+        function format ( data ) {
+            return '<div style ="font-size:15px;margin-left:115px" >'  + data.beschreibung +'</div>';
+        }
+
+
+
+        // Filter "Art der Arbeit" und "Fachrichtung"
+        $(document).ready(function(e) {
+            var dataTable;
+            $.ajax({
+                url: "/themen/",
+                type: "GET",
+                success: function (data) {
+                    dataTable = $('#myTable').DataTable({
+                        data: data,
+                        columns: [
+                            {title: "ID", data: "_id"},
+                            {
+                                "className": 'arbeitDetails',
+                                "orderable": false,
+                                "data": null,
+                                "defaultContent": '<span class="isShown fa fa-minus"></span><span class="isHidden fa fa-plus"></span>'
+                            },
+                            {title: "Titel der Arbeit" , data: "arbeitsTitel"},
+                            {title: "Professor", data: "_dozent", className: "filter"},
+                            {title: "Art der Arbeit", data: "arbeitsArt", className: "filter"},
+                            {title: "Fachrichtung", data: "fachrichtung", className: "filter"},
+                            {title: "Datum", data: "erstellDatum"}
+                        ],
+                        ordering: false,
+                        language: {
+                            "sEmptyTable":      "Keine Daten in der Tabelle vorhanden",
+                            "sInfo":            "_START_ bis _END_ von _TOTAL_ Einträgen",
+                            "sInfoEmpty":       "Keine Daten vorhanden",
+                            "sInfoFiltered":    "(gefiltert von _MAX_ Einträgen)",
+                            "sInfoPostFix":     "",
+                            "sInfoThousands":   ".",
+                            "sLengthMenu":      "_MENU_ Einträge anzeigen",
+                            "sLoadingRecords":  "Wird geladen ..",
+                            "sProcessing":      "Bitte warten ..",
+                            "sSearch":          "Suchen",
+                            "sZeroRecords":     "Keine Einträge vorhanden",
+                            "oPaginate": {
+                                "sFirst":       "Erste",
+                                "sPrevious":    "Zurück",
+                                "sNext":        "Nächste",
+                                "sLast":        "Letzte"
+                            },
+                            "oAria": {
+                                "sSortAscending":  ": aktivieren, um Spalte aufsteigend zu sortieren",
+                                "sSortDescending": ": aktivieren, um Spalte absteigend zu sortieren"
+                            },
+                            "select": {
+                                "rows": {
+                                    "_": "%d Zeilen ausgewählt",
+                                    "0": "",
+                                    "1": "1 Zeile ausgewählt"
+                                }
+                            },
+                            "buttons": {
+                                "print":    "Drucken",
+                                "colvis":   "Spalten",
+                                "copy":     "Kopieren",
+                                "copyTitle":    "In Zwischenablage kopieren",
+                                "copyKeys": "Taste <i>ctrl</i> oder <i>\u2318</i> + <i>C</i> um Tabelle<br>in Zwischenspeicher zu kopieren.<br><br>Um abzubrechen die Nachricht anklicken oder Escape drücken.",
+                                "copySuccess": {
+                                    "_": "%d Spalten kopiert",
+                                    "1": "1 Spalte kopiert"
+                                }
+                            }
+                        },
+                        initComplete: function () {
+                            this.api().columns(".filter").every( function () {
+                                var column = this;
+                                var select = $('<select class="filterDropdown"><option value="">Alle</option></select>')
+                                    .appendTo( $(column.header()))
+                                    .on( 'change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                            $(this).val()
+                                        );
+
+                                        column
+                                            .search( val ? '^'+val+'$' : '', true, false )
+                                            .draw();
+                                    } );
+
+                                column.data().unique().sort().each( function ( d, j ) {
+                                    select.append( '<option value="'+d+'">'+d+'</option>' )
+                                } );
+                            } );
+                        }
+                    } );
+
+                }, error: function (jqHXR, textStatus, errorThrown) {
+
+                }
+            });
+
+            // Add event listener for opening and closing details
+            $('#myTable').on('click', 'td.arbeitDetails', function () {
+                var tr = $(this).closest('tr');
+                var row = dataTable.row( tr );
+
+                if ( row.child.isShown() ) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    row.child( format(row.data()) ).show();
+                    tr.addClass('shown');
+                }
+            } );
+
+        });
+    </script>
+    <script src="/javascript.js"></script>
+</body>
